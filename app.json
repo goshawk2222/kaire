@@ -4,11 +4,7 @@
   "repository": "https://github.com/ParsePlatform/parse-server-example",
   "logo": "https://avatars0.githubusercontent.com/u/1294580?v=3&s=200",
   "keywords": ["node", "express", "parse"],
-  "scripts": {
-    "dokku": {
-      "predeploy": "./node_modules/bower/bin/bower install --allow-root"
-    }
-  },
+  "scripts": {},
   "env": {
     "PARSE_MOUNT": {
       "description": "Configure Parse API route.",
