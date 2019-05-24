@@ -1,33 +1,23 @@
-FROM node:latest
+FROM node:10.15.0
 
-RUN mkdir app
-
-ADD . /app
 WORKDIR /app
+
+ADD package.json /app/package.json
 RUN npm install
 
-# ENV APP_ID setYourAppId
-# ENV MASTER_KEY setYourMasterKey
-# ENV DATABASE_URI setMongoDBURI
-ENV SERVER_URL http://myeventapp.quanlabs.com/parse
-ENV PUBLIC_SERVER_URL http://myeventapp.quanlabs.com/parse
-ENV APP_NAME My Event App
+ADD . /app
+
+ENV NODE_ENV='production'
+ENV LOG_LEVEL='error'
+
+ENV APP_ID E62j8STIcM
+ENV MASTER_KEY Rpg9bv8jiL
+ENV PUBLIC_SERVER_URL https://admin.chiesadisassari.it/parse
+ENV APP_NAME Kaire
 ENV MAILGUN_API_KEY key-004454825826125a446123cf1ca7d3c3
 ENV MAILGUN_DOMAIN quanlabs.com
 ENV MAILGUN_FROM_ADDRESS dev@quanlabs.com
 ENV MAILGUN_TO_ADDRESS info@quanlabs.com
 
-# Optional (default : 'parse/cloud/main.js')
-# ENV CLOUD_CODE_MAIN cloudCodePath
-
-# Optional (default : '/parse')
-# ENV PARSE_MOUNT mountPath
-
-# EXPOSE 1337
-
-# Uncomment if you want to access cloud code outside of your container
-# A main.js file must be present, if not Parse will not start
-
-# VOLUME /parse/cloud
-
-CMD [ "npm", "start" ]
+ENV PARSE_DASHBOARD_USER='admin'
+ENV PARSE_DASHBOARD_PASS='$2y$12$FjjhORnNdorLBNbkhVTP0e..HwP3fRKov9wYmo.2mGsJ4y96AviZm'

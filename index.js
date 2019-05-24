@@ -1,5 +1,6 @@
 var express = require('express');
 var ParseServer = require('parse-server').ParseServer;
+const ParseDashboard = require('parse-dashboard')
 var S3Adapter = require('parse-server').S3Adapter;
 var expressLayouts = require('express-ejs-layouts');
 var bodyParser = require('body-parser');
@@ -13,11 +14,9 @@ var FSFilesAdapter = require('parse-server-fs-adapter');
 
 // Parse configuration
 var databaseUri = process.env.DATABASE_URI || process.env.MONGOLAB_URI || process.env.MONGO_URL;
-var serverUrl = process.env.SERVER_URL || 'http://localhost:1337/parse';
 var publicServerUrl = process.env.PUBLIC_SERVER_URL || 'http://localhost:1337/parse';
 var appId = process.env.APP_ID || 'myAppId';
 var masterKey = process.env.MASTER_KEY || 'myMasterKey';
-var restApiKey = process.env.REST_API_KEY || 'myRestApiKey';
 var appName = process.env.APP_NAME || 'My Event App';
 
 // Mailgun configuration
@@ -59,11 +58,10 @@ var mailGenerator = new Mailgen({
 
 var api = new ParseServer({
   databaseURI: databaseUri || 'mongodb://localhost:27017/events',
-  cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
+  cloud: __dirname + '/cloud/main.js',
   appId: appId,
   masterKey: masterKey,
-  serverURL: serverUrl,
-  restAPIKey: restApiKey,
+  serverURL: `http://localhost:${process.env.PORT}/parse`,
   filesAdapter: filesAdapter,
   verifyUserEmails: false,
   publicServerURL: publicServerUrl,
@@ -78,6 +76,29 @@ var api = new ParseServer({
   }
 });
 
+// Parse Dashboard
+// https://github.com/parse-community/parse-dashboard
+
+const dashboard = new ParseDashboard({
+  apps: [
+    {
+      serverURL: process.env.PUBLIC_SERVER_URL,
+      appId: process.env.APP_ID,
+      masterKey: process.env.MASTER_KEY,
+      appName: process.env.APP_NAME,
+      production: true,
+    }
+  ],
+  users: [
+    {
+      user: process.env.PARSE_DASHBOARD_USER,
+      pass: process.env.PARSE_DASHBOARD_PASS
+    },
+  ],
+  useEncryptedPasswords: true,
+  trustProxy: 1
+}, { allowInsecureHTTP: true, cookieSessionSecret: process.env.MASTER_KEY });
+
 var app = express();
 
 app.set('view engine', 'ejs');
@@ -87,22 +108,25 @@ app.set('views', 'views');
 var mountPath = process.env.PARSE_MOUNT || '/parse';
 app.use(mountPath, api);
 
+// Serve the Parse Dashboard on the /dashboard URL prefix
+app.use('/parse-dashboard', dashboard);
+
 app.use(express.static('public'));
 app.use(expressLayouts);
 app.use(cookieParser());
 app.use(methodOverride());
 
 app.use(cookieSession({
-  name: 'myeventapp.sess',
-  secret: 'MY_EVENT_APP_SECRET_SIGNING_KEY', // Put any random string here
-  maxAge: 15724800000
-}));
+  name: process.env.APP_ID + '.sess',
+  secret: process.env.MASTER_KEY,
+  maxAge: 365 * 24 * 60 * 60 * 1000 // 1 year
+}))
 
 app.use(function (req, res, next) {
   res.locals.user = req.session.user;
   res.locals.page = req.url.split('/').pop();
   res.locals.appId = appId;
-  res.locals.serverUrl = serverUrl;
+  res.locals.serverUrl = publicServerUrl;
   next();
 });
 
@@ -141,10 +165,9 @@ var isAdmin = function (req, res, next) {
   var objUser;
 
   return Parse.Cloud.httpRequest({
-    url: serverUrl + '/users/me',
+    url: `http://localhost:${process.env.PORT}/parse/users/me`,
     headers: {
       'X-Parse-Application-Id': appId,
-      'X-Parse-REST-API-Key': restApiKey,
       'X-Parse-Session-Token': req.session.token
     }
   }).then(function (userData) {
@@ -174,10 +197,9 @@ var isAdmin = function (req, res, next) {
 var isNotAuthenticated = function (req, res, next) {
 
   Parse.Cloud.httpRequest({
-    url: serverUrl + '/users/me',
+    url: `http://localhost:${process.env.PORT}/parse/users/me`,
     headers: {
       'X-Parse-Application-Id': appId,
-      'X-Parse-REST-API-Key': restApiKey,
       'X-Parse-Session-Token': req.session.token
     }
   }).then(function (userData) {
