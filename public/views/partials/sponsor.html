@@ -1,0 +1,77 @@
+<md-dialog flex="100" flex-gt-xs="40" aria-label="Sponsor Dialog">
+  <form name="form" role="form" novalidate>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 ng-show="isCreating">New sponsor</h2>
+        <h2 ng-show="!isCreating">Edit {{::sponsor.name }}</h2>
+        <span flex></span>
+        <ng-md-icon icon="close" class="icon-close" ng-click="cancel()"
+          aria-label="Close dialog"></ng-md-icon>
+      </div>
+    </md-toolbar>
+    <md-dialog-content layout-padding>
+      <md-content layout="column">
+
+        <md-input-container class="md-block">
+          <label>Name *</label>
+          <input type="text" required name="name" ng-model="sponsor.name">
+          <div ng-messages="form.name.$error" ng-show="form.$submitted">
+            <div ng-message="required">Field required</div>
+          </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+          <label>Website</label>
+          <input type="url" name="website" ng-model="sponsor.website">
+          <div ng-messages="form.website.$error" ng-show="form.$submitted">
+            <div ng-message="url">Invalid URL</div>
+          </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+          <label>Order</label>
+          <input type="number" name="order" ng-model="sponsor.order" required>
+          <div ng-messages="form.order.$error" ng-show="form.$submitted">
+            <div ng-message="required">Field required</div>
+          </div>
+        </md-input-container>
+
+        <div layout="row" layout-align="start center">
+          <md-input-container md-no-float>
+            <label>Upload Image *</label>
+            <input type="text" ng-model="imageFilename" disabled>
+          </md-input-container>
+          <ng-md-icon icon="photo_camera" class="photo-camera"
+            ng-class="{ 'photo-active': sponsor.image.url() }"
+            ngf-select="uploadImage($file, $invalidFile)" ngf-max-size="2MB"
+            ngf-pattern="'image/*'" accept="image/*">
+            <md-tooltip>
+              Add Image
+            </md-tooltip>
+          </ng-md-icon>
+          <md-progress-circular class="md-primary" md-diameter="30"
+            ng-if="isImageUploading">
+          </md-progress-circular>
+        </div>
+      </md-content>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button class="md-raised" md-raised md-primary ng-click="cancel()">
+       Cancel
+      </md-button>
+      <md-button type="submit" class="md-raised md-primary"
+        ng-click="onSaveSponsor(form.$valid)"
+        ng-disabled="isSavingSponsor"
+        ng-show="isCreating">
+        {{ !isSavingSponsor ? 'Save' : 'Saving...' }}
+      </md-button>
+      <md-button type="submit" class="md-raised md-primary"
+        ng-click="onUpdateSponsor(form.$valid)"
+        ng-disabled="isSavingSponsor"
+        ng-show="!isCreating">
+        {{ !isSavingSponsor ? 'Update' : 'Updating...' }}
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

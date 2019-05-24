@@ -1,0 +1,81 @@
+<md-content ng-controller="SponsorCtrl">
+	<md-table-toolbar>
+		<div layout="row">
+			<md-content flex-gt-md="65" flex="100" style="overflow: hidden">
+				<br>
+				<div layout-gt-sm="row" class="filter-bar">
+					<md-input-container class="md-block" flex-gt-xs>
+						<label>Search by Name</label>
+						<input type="text" ng-model="query.filter"
+							ng-model-options="{ debounce: 1000 }" ng-change="onQueryChange()">
+					</md-input-container>
+				</div>
+			</md-content>
+		</div>
+	</md-table-toolbar>
+
+	<md-table-container>
+	  <table md-table md-progress="promise">
+	    <thead md-head>
+	      <tr md-row>
+	      	<th md-column></th>
+	        <th md-column>Name</th>
+	        <th md-column>Website</th>
+	        <th md-column>Order</th>
+					<th md-column>Created At</th>
+					<th md-column>Updated At</th>
+			<th name="Actions">
+	      </tr>
+	    </thead>
+	    <tbody md-body>
+	      <tr md-row ng-repeat="sponsor in sponsors">
+	      	<td md-cell>
+	      		<img class="event-thumb" ng-src="/images/placeholder.png"
+						actual-src="{{ sponsor.image.url() }}" />
+	      	</td>
+	      	<td md-cell>{{:: sponsor.name }}</td>
+	      	<td md-cell>{{:: sponsor.website }}</td>
+	      	<td md-cell>{{:: sponsor.order }}</td>
+					<td md-cell>{{:: sponsor.createdAt | date:'mediumDate' }}</td>
+					<td md-cell>{{:: sponsor.updatedAt | date:'mediumDate' }}</td>
+	        <td md-cell>
+				<md-menu>
+			      <md-button aria-label="Open menu" class="md-icon-button"
+			        ng-click="openMenu($mdOpenMenu, $event)">
+			        <ng-md-icon md-menu-origin icon="more_vert"
+			          layout="row" layout-align="start center">
+			        </ng-md-icon>
+			      </md-button>
+			      <md-menu-content width="3">
+
+			        <md-menu-item>
+			          <md-button aria-label="Edit sponsor"
+								  ng-click="onUpdateSponsor($event, sponsor)">
+			            Edit
+			          </md-button>
+			        </md-menu-item>
+
+			        <md-menu-item aria-label="Delete sponsor">
+			          <md-button aria-label="Delete sponsor"
+								  ng-click="onDestroySponsor($event, sponsor)">
+			            Delete
+			          </md-button>
+			        </md-menu-item>
+
+			        </md-menu-item>
+
+			      </md-menu-content>
+			    </md-menu>
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</md-table-container>
+
+  <md-button class="md-fab md-fab md-fab-bottom-right"
+    aria-label="New Sponsor" ng-click="onCreateSponsor($event)">
+    <ng-md-icon class="icon-add" icon="add"
+      layout="column" layout-align="center center">
+    </ng-md-icon>
+  </md-button>
+</md-content>

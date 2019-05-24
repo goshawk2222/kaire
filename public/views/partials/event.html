@@ -1,0 +1,92 @@
+<md-dialog flex="100" flex-gt-xs="40" aria-label="Event Dialog">
+  <form name="form" role="form" novalidate>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 ng-show="isCreating">New event</h2>
+        <h2 ng-show="!isCreating">Edit {{::event.title }}</h2>
+        <span flex></span>
+        <ng-md-icon icon="close" class="icon-close" ng-click="cancel()"
+          aria-label="Close dialog"></ng-md-icon>
+      </div>
+    </md-toolbar>
+    <md-dialog-content layout-padding>
+      <md-content layout="column">
+
+        <md-input-container class="md-block">
+          <label>Title *</label>
+          <input type="text" required name="title" ng-model="event.title">
+          <div ng-messages="form.title.$error" ng-show="form.$submitted">
+            <div ng-message="required">Title required</div>
+          </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+          <label>Description</label>
+          <textarea name="description"
+            ng-maxlength="600" ng-model="event.description"
+            columns="2" md-maxlength="600">
+          </textarea>
+          <div ng-messages="form.description.$error" ng-show="form.$submitted">
+            <div ng-message="required">Description required</div>
+            <div ng-message="maxlength">Description too large</div>
+          </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+          <label>Start *</label>
+          <input type="time" name="start" ng-model="event.start" required>
+          <div ng-messages="form.start.$error" ng-show="form.$submitted">
+            <div ng-message="time">Invalid value</div>
+          </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+          <label>Duration *</label>
+          <input type="time" name="duration" ng-model="event.duration" required>
+          <div ng-messages="form.duration.$error" ng-show="form.$submitted">
+            <div ng-message="time">Invalid value</div>
+          </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+          <label>Location</label>
+          <input type="text" name="location" ng-model="event.location">
+        </md-input-container>
+
+        <div layout="row" layout-align="start center">
+          <md-input-container md-no-float>
+            <label>Upload Image *</label>
+            <input type="text" ng-model="imageFilename" disabled>
+          </md-input-container>
+          <ng-md-icon icon="photo_camera" class="photo-camera"
+            ng-class="{ 'photo-active': event.image.url() }"
+            ngf-select="uploadImage($file, $invalidFile)" ngf-max-size="2MB"
+            ngf-pattern="'image/*'" accept="image/*">
+            <md-tooltip>
+              Add Image
+            </md-tooltip>
+          </ng-md-icon>
+          <md-progress-circular class="md-primary" md-diameter="30"
+            ng-if="isImageUploading">
+          </md-progress-circular>
+        </div>
+      </md-content>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+      <md-button class="md-raised" md-raised md-primary ng-click="cancel()">
+       Cancel
+      </md-button>
+      <md-button type="submit" class="md-raised md-primary" ng-click="onSaveEvent(form.$valid)"
+        ng-disabled="isSavingEvent"
+        ng-show="isCreating">
+        {{ !isSavingEvent ? 'Save' : 'Saving...' }}
+      </md-button>
+      <md-button type="submit" class="md-raised md-primary" ng-click="onUpdateEvent(form.$valid)"
+        ng-disabled="isSavingEvent"
+        ng-show="!isCreating">
+        {{ !isSavingEvent ? 'Update' : 'Updating...' }}
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

@@ -1,0 +1,85 @@
+<md-content ng-controller="EventCtrl">
+	<md-table-toolbar>
+		<div layout="row">
+			<md-content flex-gt-md="65" flex="100" style="overflow: hidden">
+				<br>
+				<div layout-gt-sm="row" class="filter-bar">
+					<md-input-container class="md-block" flex-gt-xs>
+						<label>Search by Title</label>
+						<input type="text" ng-model="query.filter"
+							ng-model-options="{ debounce: 1000 }" ng-change="onQueryChange()">
+					</md-input-container>
+
+					<md-datepicker ng-model="query.date" ng-change="onQueryChange()"
+						md-placeholder="Enter date" flex-gt-xs>
+					</md-datepicker>
+				</div>
+			</md-content>
+		</div>
+	</md-table-toolbar>
+
+	<md-table-container>
+	  <table md-table md-progress="promise">
+	    <thead md-head>
+	      <tr md-row>
+	      	<th md-column></th>
+	        <th md-column>Title</th>
+	        <th md-column>Start</th>
+	        <th md-column>Duration</th>
+					<th md-column>Created At</th>
+					<th md-column>Updated At</th>
+			<th name="Actions">
+	      </tr>
+	    </thead>
+	    <tbody md-body>
+	      <tr md-row ng-repeat="event in events">
+	      	<td md-cell>
+	      		<img class="event-thumb" ng-src="/images/placeholder.png"
+						actual-src="{{ event.imageThumb.url() }}" />
+	      	</td>
+	      	<td md-cell>{{:: event.title }}</td>
+					<td md-cell>{{:: event.start | date: 'shortTime' }}</td>
+					<td md-cell>{{:: event.duration | date:'HH:mm' }}</td>
+					<td md-cell>{{:: event.createdAt | date:'mediumDate' }}</td>
+					<td md-cell>{{:: event.updatedAt | date:'mediumDate' }}</td>
+	        <td md-cell>
+				<md-menu>
+			      <md-button aria-label="Open menu" class="md-icon-button"
+			        ng-click="openMenu($mdOpenMenu, $event)">
+			        <ng-md-icon md-menu-origin icon="more_vert"
+			          layout="row" layout-align="start center">
+			        </ng-md-icon>
+			      </md-button>
+			      <md-menu-content width="3">
+
+			        <md-menu-item>
+			          <md-button aria-label="Edit event"
+								  ng-click="onUpdateEvent($event, event)">
+			            Edit
+			          </md-button>
+			        </md-menu-item>
+
+			        <md-menu-item aria-label="Delete event">
+			          <md-button aria-label="Delete event"
+								  ng-click="onDestroyEvent($event, event)">
+			            Delete
+			          </md-button>
+			        </md-menu-item>
+
+			        </md-menu-item>
+
+			      </md-menu-content>
+			    </md-menu>
+	        </td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</md-table-container>
+
+  <md-button class="md-fab md-fab md-fab-bottom-right"
+    aria-label="New Event" ng-click="onCreateEvent($event)">
+    <ng-md-icon class="icon-add" icon="add"
+      layout="column" layout-align="center center">
+    </ng-md-icon>
+  </md-button>
+</md-content>
